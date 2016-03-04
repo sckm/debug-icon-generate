@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage
 import java.util.List
 
 class DebugIconGeneratePlugin implements Plugin<Project> {
+    def static int MDPI_ICON_PIXEL_SIZE = 48;
+
     @Override
     void apply(Project project) {
         project.android.applicationVariants.all { ApplicationVariant variant ->
@@ -73,8 +75,10 @@ class DebugIconGeneratePlugin implements Plugin<Project> {
         int width = bufImage.width
         int height = bufImage.height
 
+        int scaledFontSize = width * fontSize / MDPI_ICON_PIXEL_SIZE;
+
         Graphics2D g = bufImage.createGraphics();
-        g.setFont(new Font(fontName, Font.PLAIN, fontSize))
+        g.setFont(new Font(fontName, Font.PLAIN, scaledFontSize))
         int lineHeight = g.getFontMetrics().getHeight()
 
         // TODO changeable color
