@@ -16,6 +16,8 @@ class DebugIconGeneratePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        project.extensions.create("debugIconGenerate", PluginExtension)
+
         project.android.applicationVariants.all { ApplicationVariant variant ->
             if (!variant.buildType.debuggable) {
                 return
@@ -32,10 +34,17 @@ class DebugIconGeneratePlugin implements Plugin<Project> {
                 variant.mergeResources.doLast {
                     findIconFiles(output).each { File icon ->
                         def buildName = variant.flavorName + " " + variant.buildType.name
-                        def version = variant.versionName
+
+                        def versionName =
+                                project.debugIconGenerate.versionNamePrefix +
+                                        variant.versionName +
+                                        project.debugIconGenerate.versionNameSuffix
+
+                        def fontSize = project.debugIconGenerate.fontSize
+                        def fontName = project.debugIconGenerate.fontName
 
                         // TODO args should be optional
-                        drawTextToImageFile(icon, [buildName, version] as String[], 8, "Arial")
+                        drawTextToImageFile(icon, [buildName, versionName] as String[], fontSize, fontName)
                     }
                 }
             }
