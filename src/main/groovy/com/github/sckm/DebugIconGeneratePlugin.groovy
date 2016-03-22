@@ -35,10 +35,9 @@ class DebugIconGeneratePlugin implements Plugin<Project> {
                     findIconFiles(output).each { File icon ->
                         def buildName = variant.flavorName + " " + variant.buildType.name
 
-                        def versionName =
-                                project.debugIconGenerate.versionNamePrefix +
-                                        variant.versionName +
-                                        project.debugIconGenerate.versionNameSuffix
+                        def versionName = (project.debugIconGenerate.versionText.isEmpty()
+                                ? variant.versionName
+                                : project.debugIconGenerate.versionText)
 
                         def fontSize = project.debugIconGenerate.fontSize
                         def fontName = project.debugIconGenerate.fontName
