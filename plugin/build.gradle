@@ -1,0 +1,99 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+def groupName = 'com.github.sckm'
+def versionName = rootProject.ext.versionName
+archivesBaseName = 'debug-icon-generate'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.android.tools.build:gradle:1.2.3'
+}
+
+task javadocJar(type: Jar, dependsOn: groovydoc) {
+    classifier = 'javadoc'
+    from "${buildDir}/javadoc"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath)
+    }
+}
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.8'
+}
+
+bintray {
+    def props = new Properties()
+    file("$rootDir/upload_settings.properties").withInputStream {
+        props.load(it)
+    }
+    user = "${props.bintrayUser}"
+    key = "${props.bintrayKey}"
+    publications = ['MyPublication']
+//    dryRun = true
+    publish = true
+
+    pkg {
+        repo = 'maven'
+        name = 'debug-icon-generate'
+        desc = 'automatically generate app icon for debug'
+
+        licenses = ['Apache-2.0']
+        websiteUrl = 'https://github.com/sckm/debug-icon-generate'
+        vcsUrl = 'https://github.com/sckm/debug-icon-generate.git'
+        issueTrackerUrl = 'https://github.com/sckm/debug-icon-generate/issues'
+
+        githubRepo = 'sckm/debug-icon-generate' //Optional Github repository
+//        githubReleaseNotesFile = 'README.md' //Optional Github readme file
+
+        version {
+            name = versionName
+            desc = 'version description'
+            attributes = ["'${archivesBaseName}'": "'${groupName}'"]
+        }
+    }
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId groupName
+            artifactId archivesBaseName
+            version versionName
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
