@@ -14,7 +14,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 def groupName = 'com.github.sckm'
-def versionName = '0.2.0'
+def versionName = rootProject.ext.versionName
 archivesBaseName = 'debug-icon-generate'
 
 repositories {
