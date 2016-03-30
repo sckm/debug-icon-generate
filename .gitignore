@@ -20,8 +20,4 @@ gradle-app.setting
 
 # others
 .DS_Store
-gradle.properties
 local.properties
-
-# setting for bintray
-upload_settings.properties
