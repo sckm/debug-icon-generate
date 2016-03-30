@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'debug-icon-generate'
 
+ext {
+    versionFile = project.file("version.properties")
+}
+
 buildscript {
     repositories {
         jcenter()
@@ -39,5 +43,19 @@ dependencies {
 debugIconGenerate {
     fontSize 6                  // [Option]
     fontName 'Arial'            // [Option]
-    versionText "version here"  // [Option]
+    versionText "version(${getBuildNumber()}"  // [Option]
+}
+
+task bumpBuild << {
+    ant.propertyfile(file: versionFile) {
+        entry(key: 'build', type: 'int', operation: '+', value: 1)
+    }
+
+    println "buildNumber = ${getBuildNumber()}"
+}
+
+def String getBuildNumber() {
+    def Properties verProps = new Properties()
+    verProps.load(new FileInputStream(versionFile))
+    verProps['build']
 }
