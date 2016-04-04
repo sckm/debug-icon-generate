@@ -22,16 +22,10 @@ class DebugIconGeneratePlugin implements Plugin<Project> {
             if (!variant.buildType.debuggable) {
                 return
             }
+
             variant.outputs.each { BaseVariantOutput output ->
-
-                // remove generated icon files by last build
-                findIconFiles(output).each { File iconFile ->
-                    if (iconFile.exists()) {
-                        iconFile.delete()
-                    }
-                }
-
-                variant.mergeResources.doLast {
+                output.processResources.outputs.upToDateWhen { false }
+                output.processResources.doFirst {
                     findIconFiles(output).each { File icon ->
                         def buildName = variant.flavorName + " " + variant.buildType.name
 
@@ -72,7 +66,6 @@ class DebugIconGeneratePlugin implements Plugin<Project> {
     static String getIconFileName(File manifestFile) {
         def manifest = new XmlSlurper().parse(manifestFile)
         def iconName = manifest.application.@'android:icon'
-        println "iconName = ${iconName}"
         (iconName as String).split("/")[1]
     }
 
